@@ -1,8 +1,11 @@
-import { GetStaticProps, GetServerSideProps } from 'next'
+import { GetStaticProps } from 'next'
 import Fuse from 'fuse.js'
 import { useEffect, useState } from 'react'
 import { Film, DisplayFilms } from 'types'
 import styles from 'styles/Home.module.scss'
+import {useFilmStore} from 'store/filmsStore'
+import Link from 'next/link'
+import { Layout, Card } from 'components'
 
 export default function Home({ 
   filmsProps
@@ -10,7 +13,6 @@ export default function Home({
   filmsProps: Film[]
 }) {
   const [films, setFilms] = useState<DisplayFilms[]>([])
-
   useEffect(() => {
 		const displayFilms = filmsProps.map( ({ title, episode_id }) => ({
 			title: title,
@@ -21,9 +23,16 @@ export default function Home({
     setFilms(displayFilms)
   }, [filmsProps])
 
-  function setFilmVisiblity(e: React.ChangeEvent) {
+	const { setFilms: setFilmsFromStore } = useFilmStore()
+  useEffect(() => {
+		setFilmsFromStore(filmsProps)
+  }, [filmsProps, setFilmsFromStore])
+
+	const [searchMessage, setSearchMessage] = useState<string>('')
+	const setFilmVisiblity = (e: React.ChangeEvent) => {
     const searchTerm = (e.target as HTMLInputElement).value 
 		// if searchTerm is empty, set all films to be visible
+		setSearchMessage('')
 		if (searchTerm.length == 0) {
 			const resetFilmVisibility = films.map((film) => {
 				return {...film, isVisible: true}
@@ -39,35 +48,68 @@ export default function Home({
 			const filteredFilmsTitles = fuse.search(searchTerm)
 				.map( ({ item }) =>  item.title)
 
+			if (filteredFilmsTitles.length == 0 ) {
+				setSearchMessage('😢 No Search found')
+			}
+
 			const updatedFilmVisibility = films.map((film) => {
 				const isVisible = filteredFilmsTitles.includes(film.title)
 				return {...film, isVisible}
 			})
+			
 
 			setFilms(updatedFilmVisibility)
 		}
   }
 
-  return (
-    <div className={styles.container}>
-      <h1>
-        🎞 Star war films
-      </h1>
-      <input 
-        className={`${styles.search}`}
-        onChange={(e) => setFilmVisiblity(e)}
-        type="text"/>
-      { films?.map( ({ title, isVisible, isFavourite }, index: number) => isVisible && (
-        <h3 key={index}>
-					{ isFavourite ? '⭐ ' : ''}
-          { title }
-        </h3>
-      ))}
-    </div>
-  )
+	const toggleFilmFavourite = (index: number) => (_: React.MouseEvent) => {
+		let tmpFilms = [...films]
+		tmpFilms[index].isFavourite = !tmpFilms[index].isFavourite
+		setFilms(tmpFilms)
+
+		let cacheFavourites = tmpFilms
+			.filter(({ isFavourite }) => isFavourite)
+			.map(({ title }) => title)
+		localStorage.setItem("favouriteFilms", JSON.stringify(cacheFavourites))
+	}
+
+	return (
+		<Layout>
+			<div className={styles.main}>
+				<input 
+					className={`${styles.search}`}
+					onChange={(e) => setFilmVisiblity(e)}
+					type="text"
+				/>
+				<Card>
+					{ searchMessage.length == 0
+						? films?.sort((a,b) => a.isFavourite ? -1 : !b.isFavourite ? 1 : 0)
+						.map( ({ title, isVisible, isFavourite }, index: number) => isVisible && (
+							<div key={index}
+								className={styles.row}>
+								<button className={isFavourite ? styles.redHeart : ''} 
+									onClick={(e) => toggleFilmFavourite(index)(e)}
+								/>
+								<h3>
+									<Link href={`${title.toLowerCase().split(' ').join('-')}`}>
+										{ title }
+									</Link>
+								</h3>
+							</div>
+						))
+						: (
+							<h3>
+								{searchMessage}
+							</h3>
+						) 
+					}
+				</Card>
+			</div>
+		</Layout>
+	)
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getStaticProps: GetStaticProps = async (_) => {
   const res = await fetch('https://swapi.dev/api/films')
   const data: any = await res.json()
   return {
