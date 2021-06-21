@@ -1,7 +1,7 @@
 import { GetStaticProps, GetServerSideProps } from 'next'
 import Fuse from 'fuse.js'
 import { useEffect, useState } from 'react'
-import { Film } from 'types'
+import { Film, DisplayFilms } from 'types'
 import styles from 'styles/Home.module.scss'
 
 export default function Home({ 
@@ -9,25 +9,43 @@ export default function Home({
 }: {
   filmsProps: Film[]
 }) {
-  const [films, setFilms] = useState<Film[]>([])
-  const [filteredFilms, setFilteredFilms] = useState<string[]>([])
+  const [films, setFilms] = useState<DisplayFilms[]>([])
+
   useEffect(() => {
-    console.log({ filmsProps})
-    setFilms(filmsProps)
+		const displayFilms = filmsProps.map( ({ title, episode_id }) => ({
+			title: title,
+			id: episode_id,
+			isVisible: true,
+			isFavourite: false
+		}))
+    setFilms(displayFilms)
   }, [filmsProps])
 
-  function filterOnChange(e: Event) {
+  function setFilmVisiblity(e: React.ChangeEvent) {
     const searchTerm = (e.target as HTMLInputElement).value 
-    const fuse = new Fuse(films, {
-      threshold: 0.3,  //https://fusejs.io/api/options.html#threshold
-      keys: [`title`]
-    })
-    const fuseFilter = fuse.search(searchTerm)
-    const filter = fuseFilter.map( (fuse) =>  fuse.item.title)
-    setFilteredFilms(filter)
-    console.log(films)
-    console.table({ filteredFilms })
-    console.log(filteredFilms[films[0].title])
+		// if searchTerm is empty, set all films to be visible
+		if (searchTerm.length == 0) {
+			const resetFilmVisibility = films.map((film) => {
+				return {...film, isVisible: true}
+			})
+
+			setFilms(resetFilmVisibility)
+		} else {
+			const fuse = new Fuse(films, {
+				threshold: 0.2,  //https://fusejs.io/api/options.html#threshold
+				keys: [`title`]
+			})
+
+			const filteredFilmsTitles = fuse.search(searchTerm)
+				.map( ({ item }) =>  item.title)
+
+			const updatedFilmVisibility = films.map((film) => {
+				const isVisible = filteredFilmsTitles.includes(film.title)
+				return {...film, isVisible}
+			})
+
+			setFilms(updatedFilmVisibility)
+		}
   }
 
   return (
@@ -37,12 +55,12 @@ export default function Home({
       </h1>
       <input 
         className={`${styles.search}`}
-        onChange={(e) => filterOnChange(e)}
+        onChange={(e) => setFilmVisiblity(e)}
         type="text"/>
-      {films?.filter( (films: Film) => console.log(films.title))
-        .map( (film: Film, i: number) => (
-        <h3 key={i}>
-          {film.title}
+      { films?.map( ({ title, isVisible, isFavourite }, index: number) => isVisible && (
+        <h3 key={index}>
+					{ isFavourite ? '⭐ ' : ''}
+          { title }
         </h3>
       ))}
     </div>
