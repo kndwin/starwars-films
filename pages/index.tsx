@@ -1,10 +1,12 @@
-import { GetStaticProps } from 'next'
-import Fuse from 'fuse.js'
-import { useEffect, useState } from 'react'
-import { Film, DisplayFilms } from 'types'
-import styles from 'styles/Home.module.scss'
-import {useFilmStore} from 'store/filmsStore'
+import { GetServerSideProps } from 'next'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import Fuse from 'fuse.js'
+
+import {useFilmStore} from 'store/filmsStore'
+
+import styles from 'styles/Home.module.scss'
+import type { Film, DisplayFilms } from 'types'
 import { Layout, Card } from 'components'
 
 export default function Home({ 
@@ -56,7 +58,6 @@ export default function Home({
 				const isVisible = filteredFilmsTitles.includes(film.title)
 				return {...film, isVisible}
 			})
-			
 
 			setFilms(updatedFilmVisibility)
 		}
@@ -79,12 +80,15 @@ export default function Home({
 				<input 
 					className={`${styles.search}`}
 					onChange={(e) => setFilmVisiblity(e)}
+					placeholder='🔍 Search'
 					type="text"
 				/>
 				<Card>
 					{ searchMessage.length == 0
 						? films?.sort((a,b) => a.isFavourite ? -1 : !b.isFavourite ? 1 : 0)
-						.map( ({ title, isVisible, isFavourite }, index: number) => isVisible && (
+						.map( ({ 
+							title, isVisible, isFavourite 
+						}, index: number) => isVisible && (
 							<div key={index}
 								className={styles.row}>
 								<button className={isFavourite ? styles.redHeart : ''} 
@@ -109,7 +113,7 @@ export default function Home({
 	)
 }
 
-export const getStaticProps: GetStaticProps = async (_) => {
+export const getServerSideProps: GetServerSideProps = async (_) => {
   const res = await fetch('https://swapi.dev/api/films')
   const data: any = await res.json()
   return {

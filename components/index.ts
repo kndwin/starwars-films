@@ -1,2 +1,4 @@
-export {default as Layout} from './Layout/Layout'
-export {default as Card} from './Card/Card'
+export {default as Characters} from './Characters'
+export {default as Planets} from './Planets'
+export {default as Layout} from './Layout'
+export {default as Card} from './Card'

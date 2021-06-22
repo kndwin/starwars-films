@@ -8,8 +8,9 @@
   border: 1px solid #000;
   padding: 0.5em;
   border-radius: 6px;
-	margin: 0 0.5em 2em 0.5em; 
+	margin: 0 0.5em; 
 	width: 100%; 
+	font-size: 1.3em; 
 }
 
 .row {
@@ -20,6 +21,7 @@
 
 	h3 {
 		margin: 1em 0.5em; 
+		font-size: 1.3em; 
 		&:hover {
 			width: fit-content; 
 			background: -webkit-linear-gradient(45deg, #282828, #af4261);

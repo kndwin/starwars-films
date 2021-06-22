@@ -2,6 +2,7 @@ export type Film = {
 	title: string
 	episode_id: number
 	opening_crawl: string
+	producer: string
 	director: string
 	release_date: string
 	characters: string[]
@@ -37,5 +38,22 @@ export type Character = {
 	starships: string[]
 	created: string[]
 	edited: string[]
+	url: string
+}
+
+export type Planet = {
+	name: string
+	rotation_period: string
+	orbital_period: string
+	diameter: string
+	climate: string
+	gravity: string
+	terrain: string
+	surface_water: string
+	population: string
+	residents: string[]
+	films: string[]
+	created: string
+	edited: string
 	url: string
 }

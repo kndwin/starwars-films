@@ -1,11 +1,15 @@
-.backLink {
-	width: 100% 
+.planets {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	.planet {
+		flex: 1; 
+	}
 }
 
 .loading {
 	display: flex;
 	flex-direction: column; 
-	align-items: center;
+	align-items: flex-start;
 	justify-content: center;
 	height: 3em; 
 	font-weight: bold;
