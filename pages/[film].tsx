@@ -26,7 +26,7 @@ export default function FilmPage()  {
 	}, [selectedFilm])
 
 	return (
-		
+
 		<Layout>
 			<h3 className={styles.backLink}>
 				<Link href='/'>
@@ -40,9 +40,9 @@ export default function FilmPage()  {
 					</h3>
 					<small>
 						<strong>
-						Release date: {' '}
+							Release date: {' '}
 						</strong>
-							{selectedFilm?.release_date}
+						{selectedFilm?.release_date}
 					</small>
 					<br />
 					<small>

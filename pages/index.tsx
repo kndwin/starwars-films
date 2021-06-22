@@ -10,29 +10,29 @@ import type { Film, DisplayFilms } from 'types'
 import { Layout, Card } from 'components'
 
 export default function Home({ 
-  filmsProps
+	filmsProps
 }: {
-  filmsProps: Film[]
+	filmsProps: Film[]
 }) {
-  const [films, setFilms] = useState<DisplayFilms[]>([])
-  useEffect(() => {
+	const [films, setFilms] = useState<DisplayFilms[]>([])
+	useEffect(() => {
 		const displayFilms = filmsProps.map( ({ title, episode_id }) => ({
 			title: title,
 			id: episode_id,
 			isVisible: true,
 			isFavourite: false
 		}))
-    setFilms(displayFilms)
-  }, [filmsProps])
+		setFilms(displayFilms)
+	}, [filmsProps])
 
 	const { setFilms: setFilmsFromStore } = useFilmStore()
-  useEffect(() => {
+	useEffect(() => {
 		setFilmsFromStore(filmsProps)
-  }, [filmsProps, setFilmsFromStore])
+	}, [filmsProps, setFilmsFromStore])
 
 	const [searchMessage, setSearchMessage] = useState<string>('')
 	const setFilmVisiblity = (e: React.ChangeEvent) => {
-    const searchTerm = (e.target as HTMLInputElement).value 
+		const searchTerm = (e.target as HTMLInputElement).value 
 		// if searchTerm is empty, set all films to be visible
 		setSearchMessage('')
 		if (searchTerm.length == 0) {
@@ -48,7 +48,7 @@ export default function Home({
 			})
 
 			const filteredFilmsTitles = fuse.search(searchTerm)
-				.map( ({ item }) =>  item.title)
+			.map( ({ item }) =>  item.title)
 
 			if (filteredFilmsTitles.length == 0 ) {
 				setSearchMessage('😢 No Search found')
@@ -61,7 +61,7 @@ export default function Home({
 
 			setFilms(updatedFilmVisibility)
 		}
-  }
+	}
 
 	const toggleFilmFavourite = (index: number) => (_: React.MouseEvent) => {
 		let tmpFilms = [...films]
@@ -69,8 +69,8 @@ export default function Home({
 		setFilms(tmpFilms)
 
 		let cacheFavourites = tmpFilms
-			.filter(({ isFavourite }) => isFavourite)
-			.map(({ title }) => title)
+		.filter(({ isFavourite }) => isFavourite)
+		.map(({ title }) => title)
 		localStorage.setItem("favouriteFilms", JSON.stringify(cacheFavourites))
 	}
 
@@ -114,11 +114,11 @@ export default function Home({
 }
 
 export const getServerSideProps: GetServerSideProps = async (_) => {
-  const res = await fetch('https://swapi.dev/api/films')
-  const data: any = await res.json()
-  return {
-    props: {
-      filmsProps: data.results
-    }
-  }
+	const res = await fetch('https://swapi.dev/api/films')
+	const data: any = await res.json()
+	return {
+		props: {
+			filmsProps: data.results
+		}
+	}
 }
