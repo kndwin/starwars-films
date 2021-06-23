@@ -9,11 +9,7 @@ import styles from 'styles/Home.module.scss'
 import type { Film, DisplayFilms } from 'types'
 import { Layout, Card } from 'components'
 
-export default function Home({ 
-	filmsProps
-}: {
-	filmsProps: Film[]
-}) {
+export default function Home({ filmsProps }: { filmsProps: Film[] }) {
 	const [films, setFilms] = useState<DisplayFilms[]>([])
 	useEffect(() => {
 		const displayFilms = filmsProps.map( ({ title, episode_id }) => ({
@@ -69,8 +65,8 @@ export default function Home({
 		setFilms(tmpFilms)
 
 		let cacheFavourites = tmpFilms
-		.filter(({ isFavourite }) => isFavourite)
-		.map(({ title }) => title)
+			.filter(({ isFavourite }) => isFavourite)
+			.map(({ title }) => title)
 		localStorage.setItem("favouriteFilms", JSON.stringify(cacheFavourites))
 	}
 
