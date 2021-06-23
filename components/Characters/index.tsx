@@ -27,7 +27,7 @@ export default function Characters({ urls } : { urls: string[] | undefined}) {
 			{loadingCharacters ? (
 				<div className={cardStyles.loading}>
 					<p className={cardStyles.loadingText}>
-						{ characters.length } loaded
+						{ characters.length } / {urls?.length} loaded
 					</p>
 				</div>
 			) : (

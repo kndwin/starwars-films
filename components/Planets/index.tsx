@@ -30,7 +30,7 @@ export default function Planets({ urls } : { urls: string[] | undefined}) {
 					?  (
 						<div className={cardStyles.loading}>
 							<p className={cardStyles.loadingText}>
-								{ planets.length } loaded
+								{ planets.length } / { urls?.length } loaded
 							</p>
 						</div>
 					) : (
